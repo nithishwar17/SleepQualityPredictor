@@ -1,22 +1,22 @@
 // frontend/src/App.js
-import React, { useState } from 'react';
-import './App.css'; // Let's add some basic styling
+import React, 'react';
+import './App.css';
 
 function App() {
-  const [form, setForm] = useState({
+  const [form, setForm] = React.useState({
     age: '35',
     gender: 'Female',
-    sleep_duration: '7',
+    sleep_duration: '7.5',
     bedtime: '23:00',
-    wake_time: '06:00',
-    awakenings: '0',
-    caffeine_consumption: '25',
+    wake_time: '06:30',
+    awakenings: '1',
+    caffeine_consumption: '50',
     alcohol_consumption: '0',
     smoking_status: 'No',
     exercise_frequency: '3',
   });
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [result, setResult] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -44,53 +44,61 @@ function App() {
   }
 
   return (
-    <div className="container">
-      <h1>Sleep Quality Predictor 💤</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="grid">
-          <label> Age <input name="age" type="number" value={form.age} onChange={handleChange} /> </label>
-          <label> Gender
-            <select name="gender" value={form.gender} onChange={handleChange}>
-              <option>Female</option> <option>Male</option>
-            </select>
-          </label>
-          <label> Sleep duration (hours) <input name="sleep_duration" type="number" step="0.5" value={form.sleep_duration} onChange={handleChange} /> </label>
-          <label> Bedtime (HH:MM) <input name="bedtime" type="time" value={form.bedtime} onChange={handleChange} /> </label>
-          <label> Wakeup time (HH:MM) <input name="wake_time" type="time" value={form.wake_time} onChange={handleChange} /> </label>
-          <label> Awakenings (times per night) <input name="awakenings" type="number" value={form.awakenings} onChange={handleChange} /> </label>
-          <label> Caffeine (mg) <input name="caffeine_consumption" type="number" value={form.caffeine_consumption} onChange={handleChange} /> </label>
-          <label> Alcohol consumption (units per week) <input name="alcohol_consumption" type="number" value={form.alcohol_consumption} onChange={handleChange} /> </label>
-          <label> Smoking status
-            <select name="smoking_status" value={form.smoking_status} onChange={handleChange}>
-              <option>No</option> <option>Yes</option>
-            </select>
-          </label>
-          <label> Exercise frequency (days/week) <input name="exercise_frequency" type="number" value={form.exercise_frequency} onChange={handleChange} /> </label>
+    <div className="app-container">
+      <header className="app-header">
+        <h1>Sleep Quality Predictor 💤</h1>
+        <p>Enter your daily sleep metrics to predict your sleep quality.</p>
+      </header>
+      
+      <main className="app-main">
+        <div className="card form-card">
+          <h2>Your Sleep Metrics</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+              <label> Age <input name="age" type="number" value={form.age} onChange={handleChange} required /> </label>
+              <label> Gender
+                <select name="gender" value={form.gender} onChange={handleChange}>
+                  <option>Female</option>
+                  <option>Male</option>
+                </select>
+              </label>
+              <label> Sleep duration (hours) <input name="sleep_duration" type="number" step="0.5" value={form.sleep_duration} onChange={handleChange} required /> </label>
+              <label> Bedtime <input name="bedtime" type="time" value={form.bedtime} onChange={handleChange} required /> </label>
+              <label> Wake-up time <input name="wake_time" type="time" value={form.wake_time} onChange={handleChange} required /> </label>
+              <label> Awakenings (count) <input name="awakenings" type="number" min="0" value={form.awakenings} onChange={handleChange} required /> </label>
+              <label> Caffeine (mg) <input name="caffeine_consumption" type="number" min="0" value={form.caffeine_consumption} onChange={handleChange} required /> </label>
+              <label> Alcohol (units/week) <input name="alcohol_consumption" type="number" min="0" value={form.alcohol_consumption} onChange={handleChange} required /> </label>
+              <label> Smoking status
+                <select name="smoking_status" value={form.smoking_status} onChange={handleChange}>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </label>
+              <label> Exercise (days/week) <input name="exercise_frequency" type="number" min="0" max="7" value={form.exercise_frequency} onChange={handleChange} required /> </label>
+            </div>
+            <button type="submit" disabled={loading}> {loading ? 'Analyzing...' : 'Predict My Sleep Quality'} </button>
+          </form>
         </div>
-        <button type="submit" disabled={loading}> {loading ? 'Analyzing...' : 'Predict My Sleep Quality'} </button>
-      </form>
 
-      {result && (
-        <div className="result-card">
-          {result.error ? ( <div className="error">Error: {result.error}</div> ) : (
-            <>
-              <h3>Prediction: <span className={`label-${result.prediction_label}`}>{result.prediction_label}</span></h3>
-              <div className="probabilities">
-                <p><strong>Confidence Score:</strong></p>
-                <ul>
-                  <li>Poor: {Math.round(result.probabilities.Poor * 100)}%</li>
-                  <li>Average: {Math.round(result.probabilities.Average * 100)}%</li>
-                  <li>Good: {Math.round(result.probabilities.Good * 100)}%</li>
-                </ul>
-              </div>
-              <div className="tips">
-                <strong>💡 Personalized Tips:</strong>
-                <ul> {result.tips?.map((t, i) => <li key={i}>{t}</li>)} </ul>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+        {result && (
+          <div className={`card result-card result-${result.prediction_label?.toLowerCase()}`}>
+            {result.error ? ( <div className="error-message">Error: {result.error}</div> ) : (
+              <>
+                <h3>Prediction Result</h3>
+                <div className="prediction-display">
+                  Your sleep quality is likely to be:
+                  <span className="prediction-label">{result.prediction_label}</span>
+                </div>
+                <div className="probabilities">
+                  <span>Poor: {Math.round(result.probabilities.Poor * 100)}%</span>
+                  <span>Average: {Math.round(result.probabilities.Average * 100)}%</span>
+                  <span>Good: {Math.round(result.probabilities.Good * 100)}%</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </main>
     </div>
   );
 }
