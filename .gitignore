@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+*.env
+
+# Node.js
+node_modules/
+package-lock.json
+build/
+.pnp.*
+
+# Database file
+sleep_data.db
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
